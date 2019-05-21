@@ -24,9 +24,52 @@ namespace GameCaro
             InitializeComponent();
 
             ChessBoard = new ChessBoardManager(pnlChessBoard, txbPlayerName, pctbMark);
+            ChessBoard.EndedGame += ChessBoard_EndedGame;
+            ChessBoard.PlayerMarked += ChessBoard_PlayerMarked;
+            prcbCoolDown.Step = Cons.COOL_DOWN_STEP;
+            prcbCoolDown.Maximum = Cons.COOL_DOWN_TIME;
+            prcbCoolDown.Value = 0;
+            tmCoolDown.Interval = Cons.COOL_DOWN_INTERVAL;
 
             ChessBoard.DrawChessBoard();
+
+
         }
-        
+        void EndGame()
+        {
+            tmCoolDown.Stop();
+            pnlChessBoard.Enabled = false;
+            undoToolStripMenuItem.Enabled = false;
+            //MessageBox.Show("Kết thúc game!");
+        }
+        private void tmCoolDown_Tick(object sender, EventArgs e)
+        {
+            prcbCoolDown.PerformStep();
+            if (prcbCoolDown.Value >= prcbCoolDown.Maximum)
+            {
+                EndGame();
+                
+            }
+
+        }
+        void ChessBoard_PlayerMarked(object sender, EventArgs e)
+        {
+            tmCoolDown.Start();
+            pnlChessBoard.Enabled = false;
+            prcbCoolDown.Value = 0;
+
+            
+
+            undoToolStripMenuItem.Enabled = false;
+
+            
+        }
+
+        void ChessBoard_EndedGame(object sender, EventArgs e)
+        {
+            EndGame();
+            
+        }
     }
+
 }

@@ -91,6 +91,31 @@ namespace GameCaro
         private List<List<Button>> matrix;
         #endregion
 
+        private event EventHandler  playerMarked;
+        public event EventHandler PlayerMarked
+        {
+            add
+            {
+                playerMarked += value;
+            }
+            remove
+            {
+                playerMarked -= value;
+            }
+        }
+
+        private event EventHandler endedGame;
+        public event EventHandler EndedGame
+        {
+            add
+            {
+                endedGame += value;
+            }
+            remove
+            {
+                endedGame -= value;
+            }
+        }
         #region Initialize
         public ChessBoardManager(Panel chessBoard, TextBox playerName, PictureBox mark)
         {
@@ -113,10 +138,10 @@ namespace GameCaro
 
     public void DrawChessBoard()
         {
-            /*ChessBoard.Enabled = true;
+            ChessBoard.Enabled = true;
             ChessBoard.Controls.Clear();
 
-            playTimeLine = new Stack<PlayInfo>();
+            /*playTimeLine = new Stack<PlayInfo>();
 
             CurrentPlayer = 0;
 
@@ -164,6 +189,8 @@ namespace GameCaro
 
             ChangePlayer();
 
+            if (playerMarked != null)
+                playerMarked(this, new EventArgs());
             if (isEndGame(btn))
             {
                 EndGame();
@@ -172,7 +199,13 @@ namespace GameCaro
 
         public void EndGame()
         {
-            MessageBox.Show("Kết thúc game!");
+            if (endedGame != null)
+                endedGame(this, new EventArgs());
+        }
+
+        private void endedGame(ChessBoardManager chessBoardManager, EventArgs eventArgs)
+        {
+            throw new NotImplementedException();
         }
 
         private bool isEndGame(Button btn)
