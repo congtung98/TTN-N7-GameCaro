@@ -9,8 +9,7 @@ namespace GameCaro
 {
     public class Player
     {
-        //Modul 2
-        private string name; 
+        private string name;    //Ctrl + R + E
 
         public string Name
         {

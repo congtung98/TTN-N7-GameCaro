@@ -81,6 +81,7 @@ namespace GameCaro
                 matrix = value;
             }
         }
+
         public Stack<PlayInfo> PlayTimeLine
         {
             get
@@ -101,11 +102,9 @@ namespace GameCaro
         private PictureBox playerMark;
 
         private List<List<Button>> matrix;
-        private Stack<PlayInfo> playTimeLine;
-        #endregion
 
-        private event EventHandler  playerMarked;
-        public event EventHandler PlayerMarked
+        private event EventHandler<ButtonClickEvent> playerMarked;
+        public event EventHandler<ButtonClickEvent> PlayerMarked
         {
             add
             {
@@ -129,6 +128,9 @@ namespace GameCaro
                 endedGame -= value;
             }
         }
+        private Stack<PlayInfo> playTimeLine;
+        #endregion
+
         #region Initialize
         public ChessBoardManager(Panel chessBoard, TextBox playerName, PictureBox mark)
         {
@@ -141,15 +143,12 @@ namespace GameCaro
                 new Player("Player2", Image.FromFile(Application.StartupPath + "\\Resources\\o.png"))
             };
 
-            CurrentPlayer = 0;
-
-            ChangePlayer();
+            
         }
         #endregion
 
-    #region Methods
-
-    public void DrawChessBoard()
+        #region Methods
+        public void DrawChessBoard()
         {
             ChessBoard.Enabled = true;
             ChessBoard.Controls.Clear();
@@ -161,8 +160,7 @@ namespace GameCaro
             ChangePlayer();
 
             Matrix = new List<List<Button>>();
-            
-            //Modul1
+
             Button oldButton = new Button() { Width = 0, Location = new Point(0, 0) };
             for (int i = 0; i < Cons.CHESS_BOARD_HEIGHT; i++)
             {
@@ -200,26 +198,45 @@ namespace GameCaro
                 return;
             Mark(btn);
 
-
             PlayTimeLine.Push(new PlayInfo(GetChessPoint(btn), CurrentPlayer));
             CurrentPlayer = CurrentPlayer == 1 ? 0 : 1;
             ChangePlayer();
 
-           
-
             if (playerMarked != null)
-                playerMarked(this, new EventArgs());
+                playerMarked(this, new ButtonClickEvent(GetChessPoint(btn)));
+
             if (isEndGame(btn))
             {
                 EndGame();
             }
         }
 
+        public void OtherPlayerMark(Point point)
+        {
+            Button btn = Matrix[point.Y][point.X];
+
+            if (btn.BackgroundImage != null)
+                return;
+
+            Mark(btn);
+
+            PlayTimeLine.Push(new PlayInfo(GetChessPoint(btn), CurrentPlayer));
+
+            CurrentPlayer = CurrentPlayer == 1 ? 0 : 1;
+
+            ChangePlayer();
+
+            if (isEndGame(btn))
+            {
+                EndGame();
+            }
+        }
         public void EndGame()
         {
             if (endedGame != null)
                 endedGame(this, new EventArgs());
         }
+
         public bool Undo()
         {
             if (PlayTimeLine.Count <= 0)
@@ -234,7 +251,31 @@ namespace GameCaro
             return isUndo1 && isUndo2;
         }
 
-       
+        private bool UndoStep()
+        {
+            if (PlayTimeLine.Count <= 0)
+                return false;
+
+            PlayInfo oldPoint = PlayTimeLine.Pop();
+            Button btn = Matrix[oldPoint.Point.Y][oldPoint.Point.X];
+
+            btn.BackgroundImage = null;
+
+            if (PlayTimeLine.Count <= 0)
+            {
+                CurrentPlayer = 0;
+            }
+            else
+            {
+                oldPoint = PlayTimeLine.Peek();
+
+            }
+
+            ChangePlayer();
+
+            return true;
+        }
+
         private bool isEndGame(Button btn)
         {
             return isEndHorizontal(btn) || isEndVertical(btn) || isEndPrimary(btn) || isEndSub(btn);
@@ -249,7 +290,6 @@ namespace GameCaro
 
             return point;
         }
-
         private bool isEndHorizontal(Button btn)
         {
             Point point = GetChessPoint(btn);
@@ -374,7 +414,7 @@ namespace GameCaro
         {
             btn.BackgroundImage = Player[CurrentPlayer].Mark;
 
-            
+
         }
         private void ChangePlayer()
         {
@@ -383,5 +423,29 @@ namespace GameCaro
             PlayerMark.Image = Player[CurrentPlayer].Mark;
         }
         #endregion
+
+    }
+
+    public class ButtonClickEvent : EventArgs
+    {
+        private Point clickedPoint;
+
+        public Point ClickedPoint
+        {
+            get
+            {
+                return clickedPoint;
+            }
+
+            set
+            {
+                clickedPoint = value;
+            }
+        }
+
+        public ButtonClickEvent(Point point)
+        {
+            this.ClickedPoint = point;
+        }
     }
 }
