@@ -81,6 +81,18 @@ namespace GameCaro
                 matrix = value;
             }
         }
+        public Stack<PlayInfo> PlayTimeLine
+        {
+            get
+            {
+                return playTimeLine;
+            }
+
+            set
+            {
+                playTimeLine = value;
+            }
+        }
 
         private int currentPlayer;
 
@@ -89,6 +101,7 @@ namespace GameCaro
         private PictureBox playerMark;
 
         private List<List<Button>> matrix;
+        private Stack<PlayInfo> playTimeLine;
         #endregion
 
         private event EventHandler  playerMarked;
@@ -141,11 +154,11 @@ namespace GameCaro
             ChessBoard.Enabled = true;
             ChessBoard.Controls.Clear();
 
-            /*playTimeLine = new Stack<PlayInfo>();
+            playTimeLine = new Stack<PlayInfo>();
 
             CurrentPlayer = 0;
 
-            ChangePlayer();*/
+            ChangePlayer();
 
             Matrix = new List<List<Button>>();
             
@@ -187,7 +200,12 @@ namespace GameCaro
                 return;
             Mark(btn);
 
+
+            PlayTimeLine.Push(new PlayInfo(GetChessPoint(btn), CurrentPlayer));
+            CurrentPlayer = CurrentPlayer == 1 ? 0 : 1;
             ChangePlayer();
+
+           
 
             if (playerMarked != null)
                 playerMarked(this, new EventArgs());
@@ -202,12 +220,21 @@ namespace GameCaro
             if (endedGame != null)
                 endedGame(this, new EventArgs());
         }
-
-        private void endedGame(ChessBoardManager chessBoardManager, EventArgs eventArgs)
+        public bool Undo()
         {
-            throw new NotImplementedException();
+            if (PlayTimeLine.Count <= 0)
+                return false;
+
+            bool isUndo1 = UndoStep();
+            bool isUndo2 = UndoStep();
+
+            PlayInfo oldPoint = PlayTimeLine.Peek();
+            CurrentPlayer = oldPoint.CurrentPlayer == 1 ? 0 : 1;
+
+            return isUndo1 && isUndo2;
         }
 
+       
         private bool isEndGame(Button btn)
         {
             return isEndHorizontal(btn) || isEndVertical(btn) || isEndPrimary(btn) || isEndSub(btn);
@@ -347,7 +374,7 @@ namespace GameCaro
         {
             btn.BackgroundImage = Player[CurrentPlayer].Mark;
 
-            CurrentPlayer = CurrentPlayer == 1 ? 0 : 1;
+            
         }
         private void ChangePlayer()
         {
