@@ -38,10 +38,26 @@ namespace GameCaro
             }
         }
 
-        public Player(string name, Image mark)
+        public int Score
+        {
+            get
+            {
+                return score;
+            }
+
+            set
+            {
+                score = value;
+            }
+        }
+
+        private int score;
+
+        public Player(string name, Image mark, int score)
         {
             this.Name = name;
             this.Mark = mark;
+            this.Score = score;
         }
     }
 }

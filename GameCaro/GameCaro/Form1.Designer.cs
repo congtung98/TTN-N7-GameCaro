@@ -34,6 +34,10 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.ptcbAvatar = new System.Windows.Forms.PictureBox();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.lblOPScore = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.lblScore = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.pctbMark = new System.Windows.Forms.PictureBox();
             this.btnLan = new System.Windows.Forms.Button();
@@ -46,6 +50,7 @@
             this.newGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ptcbAvatar)).BeginInit();
             this.panel3.SuspendLayout();
@@ -85,6 +90,10 @@
             // panel3
             // 
             this.panel3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel3.Controls.Add(this.lblOPScore);
+            this.panel3.Controls.Add(this.label3);
+            this.panel3.Controls.Add(this.lblScore);
+            this.panel3.Controls.Add(this.label2);
             this.panel3.Controls.Add(this.label1);
             this.panel3.Controls.Add(this.pctbMark);
             this.panel3.Controls.Add(this.btnLan);
@@ -95,6 +104,46 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(285, 224);
             this.panel3.TabIndex = 2;
+            // 
+            // lblOPScore
+            // 
+            this.lblOPScore.AutoSize = true;
+            this.lblOPScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
+            this.lblOPScore.Location = new System.Drawing.Point(255, 118);
+            this.lblOPScore.Name = "lblOPScore";
+            this.lblOPScore.Size = new System.Drawing.Size(15, 16);
+            this.lblOPScore.TabIndex = 9;
+            this.lblOPScore.Text = "0";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(140, 118);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(109, 16);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "Opponent Score:";
+            // 
+            // lblScore
+            // 
+            this.lblScore.AutoSize = true;
+            this.lblScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
+            this.lblScore.Location = new System.Drawing.Point(87, 120);
+            this.lblScore.Name = "lblScore";
+            this.lblScore.Size = new System.Drawing.Size(15, 16);
+            this.lblScore.TabIndex = 7;
+            this.lblScore.Text = "0";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
+            this.label2.Location = new System.Drawing.Point(3, 118);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(78, 16);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Your Score:";
             // 
             // label1
             // 
@@ -168,7 +217,8 @@
             this.menuToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newGameToolStripMenuItem,
             this.undoToolStripMenuItem,
-            this.quitGameToolStripMenuItem});
+            this.quitGameToolStripMenuItem,
+            this.redoToolStripMenuItem});
             this.menuToolStripMenuItem.Name = "menuToolStripMenuItem";
             this.menuToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
             this.menuToolStripMenuItem.Text = "Menu";
@@ -196,6 +246,15 @@
             this.quitGameToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
             this.quitGameToolStripMenuItem.Text = "Quit Game";
             this.quitGameToolStripMenuItem.Click += new System.EventHandler(this.quitGameToolStripMenuItem_Click);
+            // 
+            // redoToolStripMenuItem
+            // 
+            this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
+            this.redoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.Z)));
+            this.redoToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+            this.redoToolStripMenuItem.Text = "Redo";
+            this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -242,6 +301,11 @@
         private System.Windows.Forms.ToolStripMenuItem newGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quitGameToolStripMenuItem;
+        private System.Windows.Forms.Label lblScore;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lblOPScore;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
     }
 }
 

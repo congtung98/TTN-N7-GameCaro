@@ -71,6 +71,7 @@ namespace GameCaro
         NOTIFY,
         NEW_GAME,
         UNDO,
+        REDO,
         END_GAME,
         TIME_OUT,
         QUIT

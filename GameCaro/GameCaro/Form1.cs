@@ -25,7 +25,7 @@ namespace GameCaro
 
             Control.CheckForIllegalCrossThreadCalls = false;
 
-            ChessBoard = new ChessBoardManager(pnlChessBoard, txbPlayerName, pctbMark);
+            ChessBoard = new ChessBoardManager(pnlChessBoard, txbPlayerName, pctbMark, lblScore, lblOPScore);
             ChessBoard.EndedGame += ChessBoard_EndedGame;
             ChessBoard.PlayerMarked += ChessBoard_PlayerMarked;
 
@@ -66,6 +66,12 @@ namespace GameCaro
         void Undo()
         {
             ChessBoard.Undo();
+            prcbCoolDown.Value = 0;
+        }
+
+        void Redo()
+        {
+            ChessBoard.Redo();
             prcbCoolDown.Value = 0;
         }
 
@@ -110,6 +116,16 @@ namespace GameCaro
         {
             Undo();
             socket.Send(new SocketData((int)SocketCommand.UNDO, "", new Point()));
+
+            undoToolStripMenuItem.Enabled = false;
+        }
+
+        private void redoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Redo();
+            socket.Send(new SocketData((int)SocketCommand.REDO, "", new Point()));
+
+            redoToolStripMenuItem.Enabled = false;
         }
 
         private void quitGameToolStripMenuItem_Click(object sender, EventArgs e)
@@ -212,8 +228,18 @@ namespace GameCaro
                     Undo();
                     prcbCoolDown.Value = 0;
                     break;
+                case (int)SocketCommand.REDO:
+                    Redo();
+                    prcbCoolDown.Value = 0;
+                    break;
                 case (int)SocketCommand.END_GAME:
-                    MessageBox.Show("Đã 5 con trên 1 hàng");
+                    this.Invoke((MethodInvoker)(() =>
+                    {
+                        //newGameToolStripMenuItem.Enabled = false;
+                        txbPlayerName.Text = ChessBoard.PlayerName.Text;
+                        MessageBox.Show(txbPlayerName.Text + " thắng!");
+                    }));
+
                     break;
                 case (int)SocketCommand.TIME_OUT:
                     MessageBox.Show("Hết giờ");
@@ -229,5 +255,7 @@ namespace GameCaro
             Listen();
         }
         #endregion
+
+
     }
 }

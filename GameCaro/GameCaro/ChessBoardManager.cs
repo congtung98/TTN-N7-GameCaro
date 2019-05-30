@@ -18,7 +18,6 @@ namespace GameCaro
             get { return chessBoard; }
             set { chessBoard = value; }
         }
-
         private List<Player> player;
 
         public List<Player> Player
@@ -95,6 +94,45 @@ namespace GameCaro
             }
         }
 
+        public Label PlayerScore
+        {
+            get
+            {
+                return playerScore;
+            }
+
+            set
+            {
+                playerScore = value;
+            }
+        }
+
+        public Label OpponentScore
+        {
+            get
+            {
+                return opponentScore;
+            }
+
+            set
+            {
+                opponentScore = value;
+            }
+        }
+
+        public Stack<PlayInfo> UndoTimeLine
+        {
+            get
+            {
+                return undoTimeLine;
+            }
+
+            set
+            {
+                undoTimeLine = value;
+            }
+        }
+
         private int currentPlayer;
 
         private TextBox playerName;
@@ -102,6 +140,10 @@ namespace GameCaro
         private PictureBox playerMark;
 
         private List<List<Button>> matrix;
+
+        private Label playerScore;
+
+        private Label opponentScore;
 
         private event EventHandler<ButtonClickEvent> playerMarked;
         public event EventHandler<ButtonClickEvent> PlayerMarked
@@ -129,18 +171,21 @@ namespace GameCaro
             }
         }
         private Stack<PlayInfo> playTimeLine;
+        private Stack<PlayInfo> undoTimeLine;
         #endregion
 
         #region Initialize
-        public ChessBoardManager(Panel chessBoard, TextBox playerName, PictureBox mark)
+        public ChessBoardManager(Panel chessBoard, TextBox playerName, PictureBox mark, Label playerScore, Label opponentScore)
         {
             this.ChessBoard = chessBoard;
-            this.PlayerName = playerName;
+            this.PlayerName = playerName;        
             this.playerMark = mark;
+            this.PlayerScore = playerScore;
+            this.OpponentScore = opponentScore;
             this.Player = new List<Player>()
             {
-                new Player("Player1", Image.FromFile(Application.StartupPath + "\\Resources\\x.png")),
-                new Player("Player2", Image.FromFile(Application.StartupPath + "\\Resources\\o.png"))
+                new Player("Player1", Image.FromFile(Application.StartupPath + "\\Resources\\x.png"), 0),
+                new Player("Player2", Image.FromFile(Application.StartupPath + "\\Resources\\o.png"), 0)
             };
 
             
@@ -154,6 +199,8 @@ namespace GameCaro
             ChessBoard.Controls.Clear();
 
             playTimeLine = new Stack<PlayInfo>();
+
+            undoTimeLine = new Stack<PlayInfo>();
 
             CurrentPlayer = 0;
 
@@ -199,6 +246,7 @@ namespace GameCaro
             Mark(btn);
 
             PlayTimeLine.Push(new PlayInfo(GetChessPoint(btn), CurrentPlayer));
+            UndoTimeLine.Push(new PlayInfo(GetChessPoint(btn), CurrentPlayer));
             CurrentPlayer = CurrentPlayer == 1 ? 0 : 1;
             ChangePlayer();
 
@@ -207,6 +255,10 @@ namespace GameCaro
 
             if (isEndGame(btn))
             {
+                CurrentPlayer = CurrentPlayer == 1 ? 0 : 1;
+                ChangePlayer();
+                Player[CurrentPlayer].Score++;
+                PlayerScore.Text = Player[CurrentPlayer].Score.ToString();
                 EndGame();
             }
         }
@@ -228,6 +280,11 @@ namespace GameCaro
 
             if (isEndGame(btn))
             {
+                CurrentPlayer = CurrentPlayer == 1 ? 0 : 1;
+
+                ChangePlayer();
+                Player[CurrentPlayer].Score++;
+                OpponentScore.Text = Player[CurrentPlayer].Score.ToString();
                 EndGame();
             }
         }
@@ -257,6 +314,7 @@ namespace GameCaro
                 return false;
 
             PlayInfo oldPoint = PlayTimeLine.Pop();
+            UndoTimeLine.Push(oldPoint);
             Button btn = Matrix[oldPoint.Point.Y][oldPoint.Point.X];
 
             btn.BackgroundImage = null;
@@ -276,9 +334,49 @@ namespace GameCaro
             return true;
         }
 
+        public bool Redo()
+        {
+            if (UndoTimeLine.Count <= 0)
+                return false;
+
+            bool isRedo1 = RedoStep();
+            bool isRedo2 = RedoStep();
+
+            PlayInfo oldPoint = PlayTimeLine.Peek();
+            CurrentPlayer = oldPoint.CurrentPlayer == 1 ? 0 : 1;
+
+            return isRedo1 && isRedo2;
+        }
+
+        private bool RedoStep()
+        {
+            if (UndoTimeLine.Count <= 0)
+                return false;
+
+            PlayInfo oldPoint = UndoTimeLine.Pop();
+
+            PlayTimeLine.Push(oldPoint);
+            Button btn = Matrix[oldPoint.Point.Y][oldPoint.Point.X];
+
+            btn.BackgroundImage = Player[CurrentPlayer].Mark;
+
+            if (UndoTimeLine.Count <= 0)
+            {
+                CurrentPlayer = 0;
+            }
+            else
+            {
+                oldPoint = UndoTimeLine.Peek();
+            }
+            CurrentPlayer = CurrentPlayer == 1 ? 0 : 1;
+            ChangePlayer();
+
+            return true;
+        }
+
         private bool isEndGame(Button btn)
         {
-            return isEndHorizontal(btn) || isEndVertical(btn) || isEndPrimary(btn) || isEndSub(btn);
+            return isEndHorizontal(btn) || isEndVertical(btn) || isEndPrimary(btn) || isEndSub(btn) || isSquare1(btn) || isSquare2(btn) || isSquare3(btn) || isSquare4(btn);
         }
 
         private Point GetChessPoint(Button btn)
@@ -408,6 +506,58 @@ namespace GameCaro
                     break;
             }
             return countTop + countBottom == 5;
+        }
+
+        private bool isSquare1(Button btn)
+        {
+            Point point = GetChessPoint(btn);
+
+            if (point.Y - 1 < 0 || point.X - 1 < 0)
+                return false;
+
+            if (Matrix[point.Y - 1][point.X].BackgroundImage == btn.BackgroundImage && Matrix[point.Y][point.X - 1].BackgroundImage == btn.BackgroundImage && Matrix[point.Y - 1][point.X - 1].BackgroundImage == btn.BackgroundImage)
+                return true;
+            else
+                return false;          
+        }
+
+        private bool isSquare2(Button btn)
+        {
+            Point point = GetChessPoint(btn);
+
+            if (point.Y - 1 < 0 || point.X + 1 > Cons.CHESS_BOARD_WIDTH)
+                return false;
+
+            if (Matrix[point.Y - 1][point.X].BackgroundImage == btn.BackgroundImage && Matrix[point.Y][point.X + 1].BackgroundImage == btn.BackgroundImage && Matrix[point.Y - 1][point.X + 1].BackgroundImage == btn.BackgroundImage)
+                return true;
+            else
+                return false;
+        }
+
+        private bool isSquare3(Button btn)
+        {
+            Point point = GetChessPoint(btn);
+
+            if (point.X + 1 > Cons.CHESS_BOARD_WIDTH || point.Y + 1 >= Cons.CHESS_BOARD_HEIGHT)
+                return false;
+
+            if (Matrix[point.Y + 1][point.X].BackgroundImage == btn.BackgroundImage && Matrix[point.Y][point.X + 1].BackgroundImage == btn.BackgroundImage && Matrix[point.Y + 1][point.X + 1].BackgroundImage == btn.BackgroundImage)
+                return true;
+            else
+                return false;
+        }
+
+        private bool isSquare4(Button btn)
+        {
+            Point point = GetChessPoint(btn);
+
+            if (point.X - 1 < 0 || point.Y + 1 >= Cons.CHESS_BOARD_HEIGHT)
+                return false;
+
+            if (Matrix[point.Y + 1][point.X].BackgroundImage == btn.BackgroundImage && Matrix[point.Y][point.X - 1].BackgroundImage == btn.BackgroundImage && Matrix[point.Y + 1][point.X - 1].BackgroundImage == btn.BackgroundImage)
+                return true;
+            else
+                return false;
         }
 
         private void Mark(Button btn)
